@@ -1,0 +1,20 @@
+{
+  "name": "birkenstock-aionos-agentic-retail-command-center",
+  "version": "1.0.0",
+  "description": "GitHub Pages-ready agentic omnichannel retail command center demo for BIRKENSTOCK India by AIonOS.",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "serve": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "agentic-ai",
+    "retail",
+    "supply-chain",
+    "aionos",
+    "birkenstock",
+    "github-pages"
+  ],
+  "author": "AIonOS Demo Team",
+  "license": "UNLICENSED"
+}

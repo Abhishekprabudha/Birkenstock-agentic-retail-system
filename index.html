@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIonOS × BIRKENSTOCK India | Agentic Retail Command Center</title>
+  <meta name="description" content="Agentic omnichannel retail command center demo for BIRKENSTOCK India by AIonOS." />
+  <link rel="icon" href="assets/agent-core.jpg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark">AI</div>
+        <div>
+          <p>AIonOS × BIRKENSTOCK</p>
+          <strong>Agentic Retail</strong>
+        </div>
+      </div>
+      <nav>
+        <a href="#command" class="active">Command Center</a>
+        <a href="#hero-sku">Hero SKU Protection</a>
+        <a href="#agents">AgentOps Core</a>
+        <a href="#retail-twin">Retail Twin</a>
+        <a href="#inventory-ai">Inventory AI</a>
+        <a href="#audit">Audit + ROI</a>
+      </nav>
+      <div class="pilot-card">
+        <span>90-day pilot</span>
+        <strong>Zero rip-and-replace</strong>
+        <p>SAP · Shopify · POS · WMS · Marketplace feeds remain intact.</p>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" id="command">
+        <div class="hero-copy">
+          <div class="eyebrow">Autonomous Retail Command Center</div>
+          <h1>Protect full-price sales before a hero SKU goes to zero.</h1>
+          <p>
+            A working agentic retail layer that senses demand spikes, finds idle stock,
+            recommends transfers, creates mock SAP/WMS actions, and leaves every decision auditable.
+          </p>
+          <div class="hero-actions">
+            <button id="launchSpike" class="primary-btn">Launch Mumbai Weekend Spike</button>
+            <button id="runAgents" class="secondary-btn">Run Agent Swarm</button>
+            <button id="resetDemo" class="ghost-btn">Reset Demo</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="assets/hero-retail.jpg" alt="Luxury retail control tower concept" />
+          <div class="signal-card signal-card-one">
+            <span>Data freshness</span>
+            <strong>&lt; 5 min</strong>
+          </div>
+          <div class="signal-card signal-card-two">
+            <span>Stockout risk</span>
+            <strong id="heroRiskLabel">Normal</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Executive KPIs">
+        <article class="kpi-card">
+          <span>Stores connected</span>
+          <strong>50+</strong>
+          <p>India footprint across 8 cities</p>
+        </article>
+        <article class="kpi-card">
+          <span>Channels unified</span>
+          <strong>3</strong>
+          <p>Stores + D2C + marketplaces</p>
+        </article>
+        <article class="kpi-card warning">
+          <span>Revenue at risk</span>
+          <strong id="revenueAtRisk">₹0</strong>
+          <p>Live based on stockout countdowns</p>
+        </article>
+        <article class="kpi-card success">
+          <span>Protected by agents</span>
+          <strong id="protectedRevenue">₹0</strong>
+          <p>Approved action impact</p>
+        </article>
+      </section>
+
+      <section class="two-col" id="hero-sku">
+        <article class="panel hero-sku-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Hero SKU Protection</span>
+              <h2>Arizona / Boston stockout radar</h2>
+            </div>
+            <span class="live-pill">LIVE</span>
+          </div>
+          <div id="riskCards" class="risk-cards"></div>
+        </article>
+
+        <article class="panel decision-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Recommended Action</span>
+              <h2>Best next movement</h2>
+            </div>
+            <button id="approveTopAction" class="mini-btn">Approve Top Action</button>
+          </div>
+          <div id="recommendationSpotlight" class="recommendation-empty">
+            Trigger a demand spike to let agents recommend the first transfer.
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" id="agents">
+        <div class="panel-header compact">
+          <div>
+            <span class="eyebrow">AgentOps Core</span>
+            <h2>Six agents. One governed decision loop.</h2>
+          </div>
+        </div>
+        <div class="agent-grid" id="agentGrid"></div>
+      </section>
+
+      <section class="two-col reverse" id="retail-twin">
+        <article class="panel twin-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Unified Retail Twin</span>
+              <h2>One inventory truth across stores, D2C and marketplace</h2>
+            </div>
+            <select id="skuFilter" aria-label="Filter by SKU"></select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>SKU / Size</th>
+                  <th>Location</th>
+                  <th>Channel</th>
+                  <th>Stock</th>
+                  <th>Velocity</th>
+                  <th>Cover</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody id="retailTwinTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel network-panel">
+          <img src="assets/agent-core.jpg" alt="Agent core network concept" />
+          <div class="network-copy">
+            <span class="eyebrow">From dashboards to decisions</span>
+            <h2>AIonOS sits on top. Nothing replaced.</h2>
+            <p>SAP inventory, Shopify D2C demand, POS sales, WMS stock and marketplace order signals flow into one governed decision layer.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="two-col" id="inventory-ai">
+        <article class="panel inventory-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">IntelliWarehouse</span>
+              <h2>Inventory AI closes the physical-digital gap</h2>
+            </div>
+            <button id="runVision" class="mini-btn">Run Cycle Count</button>
+          </div>
+          <img src="assets/warehouse-ai.jpg" alt="Warehouse AI cycle count concept" />
+          <div id="visionResults" class="vision-results"></div>
+        </article>
+
+        <article class="panel actions-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Mock Execution</span>
+              <h2>SAP / WMS action console</h2>
+            </div>
+          </div>
+          <div id="executionConsole" class="execution-console"></div>
+        </article>
+      </section>
+
+      <section class="two-col" id="audit">
+        <article class="panel audit-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Audit Trail</span>
+              <h2>Governed autonomy, not black-box automation</h2>
+            </div>
+          </div>
+          <div id="auditTrail" class="audit-trail"></div>
+        </article>
+
+        <article class="panel roi-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Pilot Proof Pack</span>
+              <h2>Measurable outcome view</h2>
+            </div>
+            <button id="exportReport" class="mini-btn">Export Report</button>
+          </div>
+          <div id="roiCards" class="roi-cards"></div>
+          <pre id="reportOutput" class="report-output" hidden></pre>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="src/data.js"></script>
+  <script src="src/agents.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
