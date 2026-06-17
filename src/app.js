@@ -19,7 +19,13 @@ const baseState = {
   visionResults: [],
   protectedRevenue: 0,
   stockoutsAvoided: 0,
-  scenarioActive: false
+  scenarioActive: false,
+  liveFeedActive: true,
+  liveEvents: [],
+  todayOrders: 184,
+  conversionRate: 4.8,
+  liveRevenue: 2340000,
+  lastEventAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 };
 
 let state = cloneDeep(baseState);
@@ -38,8 +44,12 @@ const els = {
   auditTrail: document.getElementById('auditTrail'),
   roiCards: document.getElementById('roiCards'),
   reportOutput: document.getElementById('reportOutput'),
-  toast: document.getElementById('toast')
+  toast: document.getElementById('toast'),
+  liveMetrics: document.getElementById('liveMetrics'),
+  liveFeed: document.getElementById('liveFeed')
 };
+
+let liveTimer = null;
 
 function init() {
   state.audit = [
@@ -77,7 +87,12 @@ function wireEvents() {
     render();
   });
   document.getElementById('exportReport').addEventListener('click', exportReport);
+  document.getElementById('toggleLive').addEventListener('click', toggleLiveFeed);
+  document.getElementById('simulateOrder').addEventListener('click', () => simulateLiveEvent('vip-order'));
+  document.getElementById('receiveShipment').addEventListener('click', () => simulateLiveEvent('warehouse-drop'));
+  document.getElementById('clearLiveFeed').addEventListener('click', clearLiveFeed);
   els.skuFilter.addEventListener('change', renderRetailTwin);
+  startLiveFeed();
 }
 
 function launchDemandSpike() {
@@ -115,6 +130,7 @@ function resetDemo() {
       meta: {}
     }
   ];
+  document.getElementById('toggleLive').textContent = 'Pause Live Feed';
   showToast('Demo reset. You are back to the baseline operating state.');
   render();
 }
@@ -159,6 +175,7 @@ function render() {
   renderExecutionConsole();
   renderAuditTrail();
   renderRoiCards();
+  renderLiveOps();
 }
 
 function renderKpis() {
@@ -252,6 +269,7 @@ function renderRetailTwin() {
       <td>${item.row.velocity24h}/day</td>
       <td>${Math.round(item.hours)}h</td>
       <td><span class="risk-tag ${item.risk}">${item.risk}</span></td>
+      <td><button class="table-action" onclick="window.simulateRowOrder('${item.row.skuId}', '${item.row.locationId}')">Sell 1</button></td>
     </tr>
   `).join('');
 }
@@ -318,6 +336,97 @@ function renderRoiCards() {
   `).join('');
 }
 
+
+function startLiveFeed() {
+  window.clearInterval(liveTimer);
+  liveTimer = window.setInterval(() => {
+    if (state.liveFeedActive) simulateLiveEvent();
+  }, 4200);
+}
+
+function toggleLiveFeed() {
+  state.liveFeedActive = !state.liveFeedActive;
+  document.getElementById('toggleLive').textContent = state.liveFeedActive ? 'Pause Live Feed' : 'Resume Live Feed';
+  createAudit(state, 'Live feed toggled', `Synthetic operations stream ${state.liveFeedActive ? 'resumed' : 'paused'} by presenter.`);
+  showToast(state.liveFeedActive ? 'Synthetic live feed resumed.' : 'Synthetic live feed paused.');
+  render();
+}
+
+function clearLiveFeed() {
+  state.liveEvents = [];
+  createAudit(state, 'Live feed cleared', 'Presenter cleared the synthetic event stream for the next demo sequence.');
+  showToast('Live event feed cleared.');
+  render();
+}
+
+function randomItem(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function addLiveEvent(type, title, detail, impact = {}) {
+  const event = {
+    id: `LIVE-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 90 + 10)}`,
+    time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    type,
+    title,
+    detail,
+    impact
+  };
+  state.liveEvents.unshift(event);
+  state.liveEvents = state.liveEvents.slice(0, 18);
+  state.lastEventAt = event.time;
+  return event;
+}
+
+function simulateLiveEvent(mode = 'auto') {
+  if (mode === 'warehouse-drop') {
+    const target = randomItem(state.inventory.filter((row) => row.channel !== 'STORE'));
+    const sku = getSku(state, target.skuId);
+    const units = 6 + Math.floor(Math.random() * 9);
+    target.inTransit += units;
+    addLiveEvent('shipment', 'Warehouse drop received', `${units} ${sku.style} units moved into in-transit for ${target.location}.`, { units });
+    createAudit(state, 'Warehouse drop simulated', `${units} ${sku.style} units added to ${target.location} in-transit inventory.`);
+    showToast(`Warehouse drop: +${units} ${sku.style} units in transit.`);
+    render();
+    return;
+  }
+
+  const candidates = state.inventory.filter((row) => row.channel !== 'STORE' || Math.random() > 0.45);
+  const row = randomItem(candidates);
+  const sku = getSku(state, row.skuId);
+  const units = mode === 'vip-order' ? 3 : 1 + Math.floor(Math.random() * 2);
+  const available = availableStock(row);
+  row.committed += Math.min(units, Math.max(1, row.stock + row.inTransit));
+  row.velocity24h = Math.round((row.velocity24h + (mode === 'vip-order' ? 1.6 : 0.35)) * 10) / 10;
+  state.todayOrders += units;
+  state.liveRevenue += units * sku.price;
+  state.conversionRate = Math.min(8.9, Math.round((state.conversionRate + 0.05) * 10) / 10);
+  addLiveEvent(mode === 'vip-order' ? 'vip' : 'order', mode === 'vip-order' ? 'VIP order committed' : 'Live order committed', `${units} ${sku.style} size ${sku.size} sold from ${row.location}; available was ${available}.`, { skuId: row.skuId, units });
+  if (riskScore(row, state) > 55) {
+    createAudit(state, 'Live risk signal', `${sku.style} ${sku.size} risk increased after synthetic order in ${row.location}.`);
+  }
+  if (mode === 'vip-order') showToast(`VIP order committed: ${units} ${sku.style} units. Risk and revenue updated.`);
+  render();
+}
+
+function renderLiveOps() {
+  els.liveMetrics.innerHTML = [
+    ['Orders today', state.todayOrders],
+    ['Live GMV', rupee.format(state.liveRevenue)],
+    ['Conversion', `${state.conversionRate.toFixed(1)}%`],
+    ['Last signal', state.lastEventAt],
+    ['Stream', state.liveFeedActive ? 'Running' : 'Paused'],
+    ['Events', state.liveEvents.length]
+  ].map(([label, value]) => `<div class="live-metric"><span>${label}</span><strong>${value}</strong></div>`).join('');
+
+  els.liveFeed.innerHTML = state.liveEvents.length ? state.liveEvents.map((event) => `
+    <div class="live-event ${event.type}">
+      <strong>${event.title}</strong>
+      <span>${event.time} · ${event.detail}</span>
+    </div>
+  `).join('') : '<div class="live-event"><strong>Awaiting first signal</strong><span>The synthetic stream will append order, shipment and risk events every few seconds.</span></div>';
+}
+
 function exportReport() {
   const report = {
     title: 'AIonOS × BIRKENSTOCK India — 90-Day Agentic Retail Pilot Proof Pack',
@@ -345,6 +454,20 @@ function showToast(message) {
 window.approveRecommendationById = function approveRecommendationById(id) {
   const execution = window.AgentEngine.approveRecommendation(state, id);
   if (execution) showToast(`${id} approved. Mock ${execution.sapSto} and ${execution.wmsTask} created.`);
+  render();
+};
+
+window.simulateRowOrder = function simulateRowOrder(skuId, locationId) {
+  const row = state.inventory.find((item) => item.skuId === skuId && item.locationId === locationId);
+  if (!row) return;
+  const sku = getSku(state, skuId);
+  row.committed += 1;
+  row.velocity24h = Math.round((row.velocity24h + 0.8) * 10) / 10;
+  state.todayOrders += 1;
+  state.liveRevenue += sku.price;
+  addLiveEvent('manual', 'Presenter action: Sell 1', `${sku.style} size ${sku.size} manually sold from ${row.location}.`, { skuId, units: 1 });
+  createAudit(state, 'Presenter action executed', `Manual Sell 1 button committed one ${sku.style} size ${sku.size} from ${row.location}.`);
+  showToast(`Action executed: sold 1 ${sku.style} from ${row.location}.`);
   render();
 };
 

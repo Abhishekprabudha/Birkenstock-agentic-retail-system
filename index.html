@@ -24,6 +24,7 @@
         <a href="#agents">AgentOps Core</a>
         <a href="#retail-twin">Retail Twin</a>
         <a href="#inventory-ai">Inventory AI</a>
+        <a href="#live-ops">Live Ops</a>
         <a href="#audit">Audit + ROI</a>
       </nav>
       <div class="pilot-card">
@@ -140,6 +141,7 @@
                   <th>Velocity</th>
                   <th>Cover</th>
                   <th>Risk</th>
+                  <th>Demo Action</th>
                 </tr>
               </thead>
               <tbody id="retailTwinTable"></tbody>
@@ -155,6 +157,25 @@
             <p>SAP inventory, Shopify D2C demand, POS sales, WMS stock and marketplace order signals flow into one governed decision layer.</p>
           </div>
         </article>
+      </section>
+
+      <section class="panel live-ops-panel" id="live-ops">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">Synthetic Live Operations</span>
+            <h2>Streaming orders, stock movements and operator actions</h2>
+          </div>
+          <div class="live-controls">
+            <button id="toggleLive" class="mini-btn">Pause Live Feed</button>
+            <button id="simulateOrder" class="mini-btn">Simulate VIP Order</button>
+            <button id="receiveShipment" class="mini-btn">Receive Warehouse Drop</button>
+            <button id="clearLiveFeed" class="mini-btn">Clear Feed</button>
+          </div>
+        </div>
+        <div class="live-dashboard">
+          <div class="live-metrics" id="liveMetrics"></div>
+          <div class="live-feed" id="liveFeed"></div>
+        </div>
       </section>
 
       <section class="two-col" id="inventory-ai">

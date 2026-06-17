@@ -332,3 +332,40 @@ select { color: var(--text); background: rgba(255,255,255,.06); border: 1px soli
   .kpi-grid, .agent-grid, .roi-cards, .decision-grid { grid-template-columns: 1fr; }
   h1 { font-size: 42px; }
 }
+
+.live-controls { display:flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.live-dashboard { display:grid; grid-template-columns: 0.9fr 1.1fr; gap: 18px; }
+.live-metrics { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.live-metric {
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.045);
+}
+.live-metric span { color: var(--muted); font-size: 12px; display:block; }
+.live-metric strong { display:block; margin-top: 8px; color: var(--gold-bright); font-size: 24px; letter-spacing: -.03em; }
+.live-feed { display:grid; gap: 10px; max-height: 360px; overflow:auto; padding-right: 6px; }
+.live-event {
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-left: 4px solid var(--blue);
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+}
+.live-event.vip { border-left-color: var(--gold-bright); }
+.live-event.shipment { border-left-color: var(--green); }
+.live-event.manual { border-left-color: var(--orange); }
+.live-event strong { display:block; }
+.live-event span { display:block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+.table-action {
+  border: 1px solid rgba(215,168,93,.3);
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: var(--text);
+  background: rgba(77,178,255,.12);
+  font-size: 12px;
+  font-weight: 800;
+}
+@media (max-width: 1180px) { .live-dashboard { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .live-metrics { grid-template-columns: 1fr; } }
+.live-ops-panel { margin-bottom: 22px; }
